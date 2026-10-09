@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Công Cụ Thêm Chữ Ký & Tách Bảng Báo Cáo PDF (Chuẩn NĐ 30/2020)</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Core Libraries (Local Offline with CDN fallbacks) -->
+  <script src="libs/pdf-lib.min.js"></script>
+  <script>
+    if (!window.PDFLib) {
+      document.write('<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"><\/script>');
+    }
+  </script>
+
+  <script src="libs/fontkit.umd.min.js"></script>
+  <script>
+    if (!window.fontkit) {
+      document.write('<script src="https://unpkg.com/@pdf-lib/fontkit/dist/fontkit.umd.min.js"><\/script>');
+    }
+  </script>
+
+  <!-- Embedded Times New Roman Fonts for 100% offline file:// compatibility -->
+  <script src="fonts/fonts.js"></script>
+  <!-- Embedded sample PDF for 100% offline file:// sample loading -->
+  <script src="sample_b64.js"></script>
+
+  <script src="libs/pdf.umd.min.js"></script>
+  <script>
+    if (!window.pdfjsLib) {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"><\/script>');
+    }
+  </script>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="header-title-group">
+      <h1>
+        <span>📋</span> Bộ Công Cụ Thêm Khối Chữ Ký & Tách Bảng Báo Cáo Học Sinh
+      </h1>
+      <p>Tự động canh lề theo bảng báo cáo gốc, tách hàng gọn gàng, liền mạch và xuất PDF chuẩn đẹp</p>
+    </div>
+    <div class="standard-badge">
+      <span>📐</span> Khối Ký Chuẩn Theo Báo Cáo
+    </div>
+  </header>
+
+  <!-- Main Work Area -->
+  <div class="app-container">
+
+    <!-- Left Sidebar: Controls -->
+    <aside class="sidebar">
+
+      <!-- Step 1: Upload PDF -->
+      <section class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <span class="section-step">1</span>
+            Tải Tệp Báo Cáo (PDF)
+          </div>
+        </div>
+
+        <div class="upload-dropzone" id="upload-dropzone">
+          <div class="upload-icon">📄</div>
+          <div class="upload-text">Kéo thả tệp PDF vào đây hoặc bấm để chọn</div>
+          <div class="upload-subtext">Hỗ trợ các báo cáo nhận xét học sinh định dạng PDF</div>
+          <input type="file" id="file-input" accept=".pdf" style="display: none;">
+        </div>
+
+        <div class="sample-buttons">
+          <button type="button" class="btn-sample" id="btn-sample-split">
+            🧪 File mẫu (4 trang - Cần tách)
+          </button>
+          <button type="button" class="btn-sample" id="btn-sample-5p">
+            🧪 File mẫu (5 trang - Đủ chỗ)
+          </button>
+        </div>
+
+        <div class="file-info-bar" id="file-info-bar">
+          <div>
+            <strong id="file-name-display">report.pdf</strong>
+            <span style="margin: 0 4px;">•</span>
+            <span id="file-pages-display">0 trang</span>
+          </div>
+          <span style="font-weight: 700; color: #15803d;">✓ Đã nạp</span>
+        </div>
+      </section>
+
+      <!-- Step 2: Signature Info -->
+      <section class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <span class="section-step">2</span>
+            Thông Tin Khối Chữ Ký & Ngày Tháng
+          </div>
+        </div>
+
+        <!-- Date & Location -->
+        <div class="form-group">
+          <label class="form-label">Địa danh & Ngày tháng (Chữ nghiêng)</label>
+          <input type="text" id="input-date" class="form-control"
+            value="TP. Hồ Chí Minh, Thứ Sáu, ngày 09 tháng 10 năm 2026"
+            placeholder="TP. Hồ Chí Minh, Thứ Sáu, ngày 09 tháng 10 năm 2026">
+          <div class="quick-chips">
+            <span class="chip date-chip" data-type="today-dow">📅 Hôm nay (Thứ, ngày...)</span>
+            <span class="chip date-chip" data-type="today">📅 Hôm nay (ngày...)</span>
+            <span class="chip date-chip" data-type="end-month">📅 Cuối tháng này</span>
+          </div>
+        </div>
+
+        <!-- Signer Title -->
+        <div class="form-group">
+          <label class="form-label">Chức danh / Tiêu đề (Chữ đứng đậm)</label>
+          <input type="text" id="input-title" class="form-control"
+            value="Giám đốc Chương trình"
+            placeholder="Giám đốc Chương trình">
+          <div class="quick-chips">
+            <span class="chip title-chip">Giám đốc Chương trình</span>
+            <span class="chip title-chip">Hiệu trưởng</span>
+            <span class="chip title-chip">Phó Hiệu trưởng</span>
+            <span class="chip title-chip">Trưởng bộ môn</span>
+            <span class="chip title-chip">Đại diện BGH</span>
+          </div>
+        </div>
+
+        <!-- Signer Name -->
+        <div class="form-group">
+          <label class="form-label">Họ và tên người ký (Chữ đứng đậm)</label>
+          <input type="text" id="input-name" class="form-control"
+            value="Võ Ngọc Thu"
+            placeholder="Võ Ngọc Thu">
+        </div>
+
+        <!-- Clearance for signature -->
+        <div class="form-group">
+          <label class="form-label">Khoảng trống ký tên & đóng dấu</label>
+          <div class="range-wrap">
+            <input type="range" id="input-clearance" min="20" max="140" value="65" step="5">
+            <span class="range-val" id="val-clearance">65 pt</span>
+          </div>
+        </div>
+
+        <!-- Font Sizes Control -->
+        <div class="form-group">
+          <label class="form-label">Tùy chỉnh cỡ chữ (Font size)</label>
+          <div class="font-size-grid">
+            <div class="font-size-item">
+              <label>Ngày tháng <span class="font-size-val" id="val-fs-date">11pt</span></label>
+              <input type="range" id="input-fs-date" min="8" max="18" value="11" step="0.5">
+            </div>
+            <div class="font-size-item">
+              <label>Chức danh <span class="font-size-val" id="val-fs-title">12pt</span></label>
+              <input type="range" id="input-fs-title" min="8" max="20" value="12" step="0.5">
+            </div>
+            <div class="font-size-item">
+              <label>Họ và tên <span class="font-size-val" id="val-fs-name">12pt</span></label>
+              <input type="range" id="input-fs-name" min="8" max="20" value="12" step="0.5">
+            </div>
+          </div>
+        </div>
+
+        <!-- Position Controls -->
+        <div class="form-group" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <label class="form-label" style="margin-bottom: 0;">Vị trí khối ký (Tọa độ Y / Dọc)</label>
+            <span class="range-val" id="val-sig-y" style="font-weight: 700; color: var(--primary);">Tự động</span>
+          </div>
+          <div class="range-wrap">
+            <input type="range" id="input-sig-y" min="50" max="800" value="300" step="5">
+          </div>
+          <div class="pos-btn-group">
+            <button type="button" class="btn-pos-chip" id="btn-pos-undertable">📍 Ngay dưới bảng</button>
+            <button type="button" class="btn-pos-chip" id="btn-pos-midpage">📍 Giữa khoảng trống</button>
+            <button type="button" class="btn-pos-chip" id="btn-pos-bottompage">📍 Đáy trang</button>
+          </div>
+          <div style="font-size: 0.72rem; color: #2563eb; margin-top: 0.35rem; display: flex; align-items: center; gap: 4px;">
+            <span>💡</span> <em>Mẹo: Bạn có thể kéo thả trực tiếp khối chữ ký trên trang xem trước!</em>
+          </div>
+        </div>
+
+        <!-- Optional Signature / Seal Image -->
+        <div class="form-group" style="margin-top: 0.5rem;">
+          <label class="form-label">Ảnh chữ ký / con dấu (Tùy chọn, PNG trong suốt)</label>
+          <input type="file" id="input-sig-image" accept="image/png, image/jpeg" class="form-control" style="font-size: 0.8rem;">
+        </div>
+      </section>
+
+      <!-- Step 3: Space Analysis & Smart Table Split -->
+      <section class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <span class="section-step">3</span>
+            Tách Hàng Bảng Sang Trang Mới (Tùy chọn)
+          </div>
+        </div>
+
+        <!-- Space Analysis Banner -->
+        <div id="space-status-banner" class="space-status-banner status-success">
+          <span style="font-size: 1.1rem;">📊</span>
+          <div id="banner-text">Vui lòng tải tệp PDF lên để hiển thị thông tin bảng.</div>
+        </div>
+
+        <!-- Toggle Row Splitting -->
+        <div class="toggle-row">
+          <div>
+            <strong style="font-size: 0.88rem; color: #1e293b;">Tách hàng sang trang mới</strong>
+            <p style="font-size: 0.75rem; color: var(--text-muted);">Chuyển một số học sinh cuối sang trang kế tiếp nếu muốn</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-split">
+            <span class="slider-switch"></span>
+          </label>
+        </div>
+
+        <!-- Split Options Card (Expandable) -->
+        <div id="split-options-card" style="display: none; padding-top: 0.75rem; border-top: 1px dashed var(--border);">
+          <div class="form-group">
+            <label class="form-label">Điểm ngắt: Chuyển từ học sinh</label>
+            <select id="select-student-split" class="form-control"></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Vi chỉnh đường cắt bảng (Tọa độ Y)</label>
+            <div class="range-wrap">
+              <input type="range" id="input-cut-y" min="100" max="750" value="310" step="2">
+              <span class="range-val" id="val-cut-y">310 pt</span>
+            </div>
+          </div>
+
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-repeat-header" checked>
+            <span>Lặp lại tiêu đề bảng ở trang mới (No/STT, Họ tên...)</span>
+          </label>
+
+          <label class="checkbox-label">
+            <input type="checkbox" id="chk-add-page-num" checked>
+            <span>Tự động đánh số trang tiếp theo ở chân trang</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Action Group -->
+      <div class="action-group">
+        <button type="button" class="btn-primary" id="btn-download-pdf">
+          <span>💾</span> TẢI XUỐNG PDF (ĐÃ THÊM CHỮ KÝ)
+        </button>
+        <button type="button" class="btn-secondary" id="btn-refresh-preview">
+          <span>🔄</span> Cập nhật Xem Trước
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- Right Pane: Interactive Live Preview -->
+    <main class="preview-pane">
+
+      <!-- Preview Toolbar -->
+      <div class="preview-toolbar">
+        <div class="page-tabs" id="page-tabs">
+          <span style="font-size: 0.82rem; color: var(--text-muted); align-self: center;">Chưa có tệp nạp</span>
+        </div>
+
+        <div class="zoom-controls">
+          <button type="button" class="btn-icon" id="btn-zoom-out" title="Thu nhỏ">🔍−</button>
+          <button type="button" class="btn-icon" id="btn-zoom-fit" title="Vừa màn hình">⊡</button>
+          <button type="button" class="btn-icon" id="btn-zoom-in" title="Phóng to">🔍+</button>
+        </div>
+      </div>
+
+      <!-- Scrollable Preview Area -->
+      <div class="preview-scroll-area">
+
+        <!-- Canvas Container -->
+        <div class="canvas-wrapper" id="canvas-wrapper" style="display: none;">
+          <canvas id="pdf-canvas"></canvas>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state">
+          <div class="empty-state-icon">📑</div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: #334155;">Chưa có tệp PDF nào được nạp</h3>
+          <p style="font-size: 0.85rem; max-width: 420px; margin-top: 0.4rem;">
+            Vui lòng kéo thả tệp báo cáo PDF vào ô bên trái hoặc bấm vào một trong các nút <strong>File mẫu</strong> để trải nghiệm tính năng thêm chữ ký và tách bảng tự động.
+          </p>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <span id="toast-msg">Thông báo</span>
+  </div>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+
+</body>
+</html>
